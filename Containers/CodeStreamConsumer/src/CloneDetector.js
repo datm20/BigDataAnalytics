@@ -82,9 +82,9 @@ class CloneDetector {
     #filterCloneCandidates(file, compareFile) {
         file.instances = file.instances || [];
         let newClones = [];
-        for (let fChunk of file.chunk)
+        for (let fChunk of file.chunks)
         {
-            for (let cChunk of compareFile.chunk)
+            for (let cChunk of compareFile.chunks)
             {
                 if(this.#chunkMatch(fChunk, cChunk))
                 {
@@ -116,6 +116,16 @@ class CloneDetector {
     }
      
     #expandCloneCandidates(file) {
+        file.instances = file.instances.reduce((accumulator, clone) => {
+        const last = accumulator[accumulator.length - 1];
+        if (!last || !last.maybeExpandWith(clone)) {
+            accumulator.push(clone);
+        }
+            return accumulator;
+        }, []);
+
+        return file;
+
         // TODO
         // For each Clone in file.instances, try to expand it with every other Clone
         // (using Clone::maybeExpandWith(), which returns true if it could expand)
@@ -130,10 +140,26 @@ class CloneDetector {
         //         and not any of the Clones used during that expansion.
         //
 
-        return file;
     }
     
     #consolidateClones(file) {
+        file.instances = file.instances.reduce((uniqueClones, currentClone) => {
+        // Look for a clone that represents the exact same code region
+        const existingClone = uniqueClones.find(clone => 
+            clone.equals(currentClone)
+        );
+
+        if (existingClone) {
+            existingClone.addTarget(currentClone);
+        } else {
+            uniqueClones.push(currentClone);
+        }
+
+        return uniqueClones;
+    }, []);
+
+    return file;
+        
         // TODO
         // For each clone, accumulate it into an array if it is new
         // If it isn't new, update the existing clone to include this one too
@@ -147,7 +173,6 @@ class CloneDetector {
         // Return: file, with file.instances containing unique Clone objects that may contain several targets
         //
 
-        return file;
     }
     
 
