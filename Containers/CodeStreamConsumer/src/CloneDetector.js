@@ -117,10 +117,10 @@ class CloneDetector {
      
     #expandCloneCandidates(file) {
         file.instances = file.instances.reduce((accumulator, clone) => {
-        const last = accumulator[accumulator.length - 1];
-        if (!last || !last.maybeExpandWith(clone)) {
-            accumulator.push(clone);
-        }
+            const last = accumulator[accumulator.length - 1];
+            if (!last || !last.maybeExpandWith(clone)) {
+                accumulator.push(clone);
+            }
             return accumulator;
         }, []);
 
@@ -144,19 +144,19 @@ class CloneDetector {
     
     #consolidateClones(file) {
         file.instances = file.instances.reduce((uniqueClones, currentClone) => {
-        // Look for a clone that represents the exact same code region
-        const existingClone = uniqueClones.find(clone => 
-            clone.equals(currentClone)
-        );
+            // Look for a clone that represents the exact same code region
+            const existingClone = uniqueClones.find(clone => 
+                clone.equals(currentClone)
+            );
 
-        if (existingClone) {
-            existingClone.addTarget(currentClone);
-        } else {
-            uniqueClones.push(currentClone);
-        }
+            if (existingClone) {
+                existingClone.addTarget(currentClone);
+            } else {
+                uniqueClones.push(currentClone);
+            }
 
-        return uniqueClones;
-    }, []);
+            return uniqueClones;
+        }, []);
 
     return file;
         
