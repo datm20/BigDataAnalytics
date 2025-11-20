@@ -10,7 +10,7 @@ const CloneStorage = require('./CloneStorage');
 const FileStorage = require('./FileStorage');
 const TimeStorage = require('./TimeStorage');
 
-const timersNShit = new TimeStorage();
+const timers = new TimeStorage();
 // Express and Formidable stuff to receice a file for further processing
 // --------------------
 const form = formidable({multiples:false});
@@ -50,8 +50,8 @@ function viewStatistics()
 
 function storeTimers(file)
 {
-    timersNShit.storeTime(file, Timer.getTimers(file, 'match'));
-    console.log(timersNShit.getAllTime());
+    timers.storeTime(file, Timer.getTimers(file, 'match'));
+    console.log(timers.getAllTime());
 }
 
 
