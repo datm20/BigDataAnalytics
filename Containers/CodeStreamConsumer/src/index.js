@@ -8,8 +8,9 @@ const Timer = require('./Timer');
 const CloneDetector = require('./CloneDetector');
 const CloneStorage = require('./CloneStorage');
 const FileStorage = require('./FileStorage');
+const TimeStorage = require('./TimeStorage');
 
-
+const timersNShit = new TimeStorage();
 // Express and Formidable stuff to receice a file for further processing
 // --------------------
 const form = formidable({multiples:false});
@@ -28,8 +29,33 @@ app.get('/', viewClones );
 const server = app.listen(PORT, () => { console.log('Listening for files on port', PORT); });
 
 
+app.get('/statistics', viewStatistics);
+
 // Page generation for viewing current progress
 // --------------------
+function viewStatistics()
+{
+    let page='<HTML><HEAD><TITLE>CodeStream Clone Detector</TITLE></HEAD>\n';
+    page += '<BODY><H1>CodeStream Clone Detector</H1>\n';
+    
+    page += lastFileTimersHTML() + '\n';
+    page += listClonesHTML() + '\n';
+    page += listProcessedFilesHTML() + '\n';
+    page += '</BODY></HTML>';
+    res.send(page);
+    // get average time for groups of 10 files
+    // Make the graph
+    // 
+}
+
+function storeTimers(file)
+{
+    timersNShit.storeTime(file, Timer.getTimers(file, 'match'));
+    console.log(timersNShit.getAllTime());
+}
+
+
+
 function getStatistics() {
     let cloneStore = CloneStorage.getInstance();
     let fileStore = FileStorage.getInstance();
@@ -143,6 +169,10 @@ function processFile(filename, contents) {
         .then( (file) => Timer.endTimer(file, 'total') )
         .then( PASS( (file) => lastFile = file ))
         .then( PASS( (file) => maybePrintStatistics(file, cd, cloneStore) ))
+
+        .then( (file) => storeTimers(file)) //Store file timers
+
+
     // TODO Store the timers from every file (or every 10th file), create a new landing page /timers
     // and display more in depth statistics there. Examples include:
     // average times per file, average times per last 100 files, last 1000 files.
