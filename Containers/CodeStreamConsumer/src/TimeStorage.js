@@ -7,12 +7,11 @@ class TimeStorage {
 
     #myTimes = [];
 
-    get numberOfClones() { return this.#myTimes.length; }
-
+    getNumberOfTimes() { return this.#myTimes.length; }
 
     storeTime(file, timer) {
         let array = {name: file.name, total:timer.total, match:timer.match}
-        console.log(array);
+        //console.log(array);
         this.#myTimes.push(array);
     }
 

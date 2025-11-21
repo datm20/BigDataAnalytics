@@ -26,6 +26,8 @@ function fileReceiver(req, res, next) {
 
 app.get('/', viewClones );
 
+app.get('/timers', viewTimers );
+
 const server = app.listen(PORT, () => { console.log('Listening for files on port', PORT); });
 
 
@@ -51,7 +53,7 @@ function viewStatistics()
 function storeTimers(file)
 {
     timers.storeTime(file, Timer.getTimers(file, 'match'));
-    console.log(timers.getAllTime());
+    //console.log(timers.getAllTime());
 }
 
 
@@ -117,6 +119,23 @@ function viewClones(req, res, next) {
     res.send(page);
 }
 
+function viewTimers(req, res, next) {
+    let page='<HTML><HEAD><TITLE>Timers</TITLE></HEAD>\n';
+    page += '<BODY><H1>CodeStream Clone Detector Timers</H1>\n';
+    page += '<P>' + getStatistics() + '</P>\n';
+    page += '<H3>Last averages</H3>'
+    page += '<P>' + getLastXAverage(10) + '</P>\n';
+    page += '<P>' + getLastXAverage(100) + '</P>\n';
+    page += '<P>' + getLastXAverage(1000) + '</P>\n';
+    page += '<H3>Interval averages</H3>'
+    for (let i = 0; i < timers.getNumberOfTimes(); i += 5000) {
+        page += '<P>' + getIntervalAverage(i, i + 5000) + '</P>\n';
+    }
+    page += showScatterPlot();
+    page += '</BODY></HTML>';
+    res.send(page);
+}
+
 // Some helper functions
 // --------------------
 // PASS is used to insert functions in a Promise stream and pass on all input parameters untouched.
@@ -146,6 +165,57 @@ function maybePrintStatistics(file, cloneDetector, cloneStore) {
     }
 
     return file;
+}
+
+function getLastXAverage(amount) {
+    const items = timers.getAllTime().slice(-amount);
+    if (items.length < amount) return `Average of last ${amount} times not available yet.`;
+
+    const sum = items.reduce((s, m) => s + m.total, 0n);
+    const avgMicroseconds = Number(sum * 10n / BigInt(items.length) + 5n) / 10 / 1000;
+
+    return `Average time for last ${amount} files: ${avgMicroseconds.toLocaleString(undefined, {minimumFractionDigits:1, maximumFractionDigits:1})} µs`;
+}
+
+function getIntervalAverage(start, end) {
+    const items = timers.getAllTime();
+    if (items.length < end) return `Average of interval ${start} - ${end} not available yet.`;
+    const interval = items.slice(start, end);
+    const sum = interval.reduce((s, m) => s + m.total, 0n);
+    const avgMicroseconds = Number(sum * 10n / BigInt(interval.length) + 5n) / 10 / 1000;
+
+    return `Average of interval ${start} - ${end}: ${avgMicroseconds.toLocaleString(undefined, {minimumFractionDigits:1, maximumFractionDigits:1})} µs`;
+}
+
+function showScatterPlot(){
+    const points = [];
+    const items = timers.getAllTime()
+    for (let i = 0; i < items.length; i++) {
+        points.push({ x: i, y: Number(items[i].total)/1000})
+    }
+
+    return(`
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <div style="width:100%; max-width:800px; margin:30px auto;">
+    <canvas id="c" width="800" height="400"></canvas>
+    <script>
+        new Chart("c", {
+        type: "scatter",
+        data: { datasets: [{ 
+            label: "Avg time per file (µs)",
+            data: ${JSON.stringify(points)},
+            backgroundColor: "#e74c3c",
+            pointRadius: 6
+        }]},
+        options: {
+            scales: {
+            x: { title: { display: true, text: "Files processed" }},
+            y: { title: { display: true, text: "Avg time (µs)" }, beginAtZero: true }
+            }
+        }
+        });
+    </script>
+    `);
 }
 
 // Processing of the file
