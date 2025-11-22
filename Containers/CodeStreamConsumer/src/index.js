@@ -31,24 +31,9 @@ app.get('/timers', viewTimers );
 const server = app.listen(PORT, () => { console.log('Listening for files on port', PORT); });
 
 
-app.get('/statistics', viewStatistics);
 
 // Page generation for viewing current progress
 // --------------------
-function viewStatistics()
-{
-    let page='<HTML><HEAD><TITLE>CodeStream Clone Detector</TITLE></HEAD>\n';
-    page += '<BODY><H1>CodeStream Clone Detector</H1>\n';
-    
-    page += lastFileTimersHTML() + '\n';
-    page += listClonesHTML() + '\n';
-    page += listProcessedFilesHTML() + '\n';
-    page += '</BODY></HTML>';
-    res.send(page);
-    // get average time for groups of 10 files
-    // Make the graph
-    // 
-}
 
 function storeTimers(file)
 {
