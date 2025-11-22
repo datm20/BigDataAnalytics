@@ -247,7 +247,7 @@ function processFile(filename, contents) {
     // and display more in depth statistics there. Examples include:
     // average times per file, average times per last 100 files, last 1000 files.
     // Perhaps throw in a graph over all files.
-        .catch( console.log );
+        .catch( err => console.log(err) );
 };
 
 /*
