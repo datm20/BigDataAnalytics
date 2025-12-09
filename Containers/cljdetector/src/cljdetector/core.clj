@@ -9,7 +9,8 @@
 (def source-type #".*\.java")
 
 (defn ts-println [& args]
-  (println (.toString (java.time.LocalDateTime/now)) args))
+  (println (.toString (java.time.LocalDateTime/now)) args)
+  (storage/add-update! (.toString (java.time.LocalDateTime/now)) args ))
 
 (defn maybe-clear-db [args]
   (when (some #{"CLEAR"} (map string/upper-case args))
