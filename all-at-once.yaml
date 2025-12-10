@@ -28,7 +28,16 @@ services:
     volumes:
       - dbstorage:/data/db
       - dbconfig:/data/configdb
-    
+
+  monitor-tool:
+    image: monitortool
+    ports: 
+      - 9090:9090
+    volumes:
+      - ./Containers/MonitorTool/src/:/app/src
+    environment:
+      DBHOST: dbstorage
+  
 volumes:
   dbstorage:
   dbconfig:

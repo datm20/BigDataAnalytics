@@ -1,0 +1,14 @@
+{% extends "skeleton.html" %}
+
+{% block body %}
+    <header>
+        <h1>Statistics</h1>
+    </header>
+
+    <main>
+    {% for chunk in chunks %}
+        {{ chunk }} <br>
+    {% endfor %}
+    </main>
+
+{% endblock %}
