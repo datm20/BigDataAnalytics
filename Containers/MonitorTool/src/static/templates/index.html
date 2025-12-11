@@ -1,14 +1,22 @@
-{% extends "skeleton.html" %}
-
-{% block body %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Statistics</title>
+</head>
+<body>
     <header>
+        <a href="{{ url_for('index') }}" class="button">Index</a>
+        <a href="{{ url_for('files') }}" class="button">Files</a>
+        <a href="{{ url_for('chunks') }}" class="button">Chunks</a>
+        <a href="{{ url_for('candidates') }}" class="button">Candidates</a>
+        <a href="{{ url_for('clones') }}" class="button">Clones</a>
         <h1>Statistics</h1>
     </header>
 
     <main>
-    {% for chunk in chunks %}
-        {{ chunk }} <br>
-    {% endfor %}
+        
     </main>
-
-{% endblock %}
+</body>
+</html>

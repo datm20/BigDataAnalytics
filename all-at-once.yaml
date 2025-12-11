@@ -37,6 +37,8 @@ services:
       - ./Containers/MonitorTool/src/:/app/src
     environment:
       DBHOST: dbstorage
+      WAIT_SECONDS: 1
+      MONITOR_DEBUG: 0  #0 for false, 1 for true
   
 volumes:
   dbstorage:

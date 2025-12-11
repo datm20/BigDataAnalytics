@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Candidates</title>
+</head>
+<body>
+    <header>
+        <a href="{{ url_for('index') }}" class="button">Index</a>
+        <a href="{{ url_for('files') }}" class="button">Files</a>
+        <a href="{{ url_for('chunks') }}" class="button">Chunks</a>
+        <a href="{{ url_for('candidates') }}" class="button">Candidates</a>
+        <a href="{{ url_for('clones') }}" class="button">Clones</a>
+        <h1>Candidate Statistics</h1>
+    </header>
+
+    <main>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <div style="width:100%; max-width:800px; margin:30px auto;">
+        <canvas id="c" width="800" height="400"></canvas>
+        <script>
+            const labels = JSON.parse('{{candidates | tojson | safe}}');
+            new Chart("c", {
+            type: "scatter",
+            data: { datasets: [{ 
+                label: "Candidates/sec",
+                data: labels,
+                backgroundColor: "#e74c3c",
+                pointRadius: 6
+            }]},
+            options: {
+                scales: {
+                x: { title: { display: true, text: "Candidates processed" }},
+                y: { title: { display: true, text: "Candidates per second" }, beginAtZero: true }
+                }
+            }
+            });
+        </script>
+
+
+
+        <div style="width:100%; max-width:800px; margin:30px auto;">
+        <canvas id="d" width="800" height="400"></canvas>
+        <script>
+            const amount = JSON.parse('{{amount | tojson | safe}}');
+            new Chart("d", {
+            type: "scatter",
+            data: { datasets: [{ 
+                label: "Amount of Candidates over time",
+                data: amount,
+                backgroundColor: "#e74c3c",
+                pointRadius: 6
+            }]},
+            options: {
+                scales: {
+                x: { title: { display: true, text: "Time since start of process(seconds)" }},
+                y: { title: { display: true, text: "Total Candidates" }, beginAtZero: true }
+                }
+            }
+            });
+        </script>
+
+
+    </main>
+</body>
+</html>

@@ -8,7 +8,7 @@
 (def dbname "cloneDetector")
 (def partition-size 100)
 (def hostname (or (System/getenv "DBHOST") DEFAULT-DBHOST))
-(def collnames ["files"  "chunks" "candidates" "clones" "statusUpdates"])
+(def collnames ["files"  "chunks" "candidates" "clones" "statusUpdates" "statistics"])
 
 (defn print-statistics []
   (let [conn (mg/connect {:host hostname})        
@@ -43,7 +43,7 @@
         collname "files"
         file-parted (partition-all partition-size files)]
     (try (doseq [file-group file-parted]
-           (mc/insert-batch db collname (map (fn [%] {:fileName (.getPath %) :contents (slurp %) :timestamp (.toString (java.time.LocalDateTime/now))}) file-group)))
+           (mc/insert-batch db collname (map (fn [%] {:fileName (.getPath %) :contents (slurp %)}) file-group)))
          (catch Exception e []))))
 
 (defn store-chunks! [chunks]
@@ -52,9 +52,7 @@
         collname "chunks"
         chunk-parted (partition-all partition-size (flatten chunks))]
     (doseq [chunk-group chunk-parted]
-      (let [with-ts (map #(assoc % :timestamp (.toString (java.time.LocalDateTime/now)) ) chunk-group)]
-        (mc/insert-batch db collname with-ts)))))
-      ;;(mc/insert-batch db collname (map (.toString (java.time.LocalDateTime/now)) identity chunk-group)))))
+      (mc/insert-batch db collname (map identity chunk-group)))))
 
 (defn store-clones! [clones]
   (let [conn (mg/connect {:host hostname})        
