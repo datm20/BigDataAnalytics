@@ -5,7 +5,7 @@
             [cljdetector.storage.storage :as storage]))
 
 (def DEFAULT-CHUNKSIZE 5)
-(def source-dir (or (System/getenv "SOURCEDIReclipse") "/tmp"))
+(def source-dir (or (System/getenv "SOURCEDIR") "/tmp"))
 (def source-type #".*\.java")
 
 (defn ts-println [& args]

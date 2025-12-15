@@ -23,8 +23,15 @@ coll_stat = db["statistics"]
 
 @app.route("/")
 def index():
-    
-    return render_template('index.html')
+    updates = coll_statuses.find({}, {})
+
+    files = coll_stat.find({"type": "files"}, {"type": 1, "count": 1, "timestamp": 1 }).limit(100)
+    chunks = coll_stat.find({"type": "chunks"}, {"type": 1, "count": 1, "timestamp": 1 }).limit(100)
+    candidates = coll_stat.find({"type": "candidates"}, {"type": 1, "count": 1, "timestamp": 1 }).limit(100)
+    clones = coll_stat.find({"type": "clones"}, {"type": 1, "count": 1, "timestamp": 1 }).limit(100)
+
+
+    return render_template('index.html', updates = updates, files = files, chunks = chunks, candidates = candidates, clones = clones)
 
 
 @app.route("/chunks")
@@ -59,12 +66,12 @@ def chunks():
     array = coll_stat.find({"type": "chunks"}, {"type": 1, "count": 1, "timestamp": 1 })
     for item in array: 
         if (start_time == 0):
-            start_time = last_time = item["timestamp"]
+            start_time = item["timestamp"]
         time_amount.append({"x": (item["timestamp"] - start_time).total_seconds(), "y": item["count"]})
 
+    return render_template('chunks.html', chunks = averages, amount = time_amount,  chunks_per_file = avg_chunks_per_file)
 
-    return render_template('chunks.html', chunks = averages, amount = time_amount, chunks_per_file = avg_chunks_per_file)
-    
+
 @app.route("/files")
 def files():
     array = coll_stat.find({"type": "files"}, {"type": 1, "count": 1, "timestamp": 1 })
@@ -93,11 +100,12 @@ def files():
     array2 = coll_stat.find({"type": "files"}, {"type": 1, "count": 1, "timestamp": 1 })
     for item in array2: 
         if (start_time == 0):
-            start_time = last_time = item["timestamp"]
+            start_time = item["timestamp"]
         time_amount.append({"x": (item["timestamp"] - start_time).total_seconds(), "y": item["count"]})
 
 
     return render_template('files.html', files = averages, amount = time_amount)
+
 
 @app.route("/candidates")
 def candidates():
@@ -106,9 +114,11 @@ def candidates():
     first_time = True
     last_count = 0
     last_time = 0
+    start_time = 0
     averages = []
     for item in array:
         if (first_time):
+            start_time = item["timestamp"]
             last_count = item["count"]
             last_time = item["timestamp"]
             first_time = False
@@ -116,7 +126,7 @@ def candidates():
 
        
         candidates_per_sec = (item["count"] - last_count)/((item["timestamp"] - last_time).total_seconds())
-        averages.append({"x": item["count"], "y": candidates_per_sec})
+        averages.append({"x": (item["timestamp"] - start_time).total_seconds(), "y": candidates_per_sec*(-1)})
         
         last_count = item["count"]
         last_time = item["timestamp"]
@@ -127,7 +137,7 @@ def candidates():
     array2 = coll_stat.find({"type": "candidates"}, {"type": 1, "count": 1, "timestamp": 1 })
     for item in array2: 
         if (start_time == 0):
-            start_time = last_time = item["timestamp"]
+            start_time = item["timestamp"]
         time_amount.append({"x": (item["timestamp"] - start_time).total_seconds(), "y": item["count"]})
 
     return render_template('candidates.html', candidates = averages, amount = time_amount)
@@ -172,7 +182,7 @@ def clones():
     array2 = coll_stat.find({"type": "clones"}, {"type": 1, "count": 1, "timestamp": 1 })
     for item in array2: 
         if (start_time == 0):
-            start_time = last_time = item["timestamp"]
+            start_time = item["timestamp"]
         time_amount.append({"x": (item["timestamp"] - start_time).total_seconds(), "y": item["count"]})
 
 

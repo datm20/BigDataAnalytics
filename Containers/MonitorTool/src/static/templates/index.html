@@ -16,7 +16,31 @@
     </header>
 
     <main>
-        
+        <h1>Updates</h1>
+        {%for u in updates%}
+            {{u}} <br>
+        {% endfor %}
+        <br>
+
+        <h1>Files</h1>
+        {%for file in files%}
+            {{file}} <br>
+        {% endfor %}
+        <br>
+        <h1>Chunks</h1>
+        {%for chunk in chunks%}
+            {{chunk}}<br>
+        {% endfor %}
+        <br>
+        <h1>Candidates</h1>
+        {%for candidate in candidates%}
+            {{candidate}}<br>
+        {% endfor %}
+        <br>
+        <h1>Clones</h1>
+        {%for clone in clones%}
+            {{clone}}<br>
+        {% endfor %}
     </main>
 </body>
 </html>
